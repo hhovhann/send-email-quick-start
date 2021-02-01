@@ -1,8 +1,5 @@
 package org.hhovhann.notification.resource;
 
-import io.quarkus.mailer.Mailer;
-import io.quarkus.mailer.reactive.ReactiveMailer;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.hhovhann.notification.service.NotificationService;
 
@@ -16,15 +13,16 @@ import java.util.concurrent.CompletionStage;
 @Path("/mail/api")
 @Tag(name="email")
 public class MailingResource {
-    @Inject
-    Mailer mailer;
-
-    @Inject
-    ReactiveMailer reactiveMailer;
 
     @Inject
     @Named("EMAIL")
     NotificationService notificationService;
+
+    @GET
+    @Path("/send-simple-email-with-qute-template")
+    public CompletionStage<Response> send() {
+        return notificationService.sendWithTemplateSimpleNotification();
+    }
 
     @GET
     @Path("/send-simple-email")

@@ -10,6 +10,11 @@ public interface NotificationService {
         System.out.println("sendSimpleNotification");
     }
 
+    default CompletionStage<Response> sendWithTemplateSimpleNotification() {
+        System.out.println("sendWithTemplateSimpleNotification");
+        return null;
+    }
+
     default CompletionStage<Response> sendASimpleEmailAsync() {
         System.out.println("sendSimpleNotification");
         return null;
@@ -19,7 +24,7 @@ public interface NotificationService {
 
     }
 
-    default void sendEmailWithHtml(){
+    default void sendEmailWithHtml() {
 
     }
 }

@@ -1,11 +1,13 @@
 package org.hhovhann.notification.service;
 
 import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.MailTemplate;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.mailer.reactive.ReactiveMailer;
+import io.quarkus.qute.api.CheckedTemplate;
 import io.smallrye.mutiny.Uni;
-import io.vertx.ext.mail.MailClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.hhovhann.notification.entity.User;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,13 +24,42 @@ public class EmailNotificationService implements NotificationService {
     String mailReceiver;
 
     @Inject
-    MailClient client; // vertx solution ...
-
-    @Inject
     Mailer mailer;
 
     @Inject
     ReactiveMailer reactiveMailer;
+
+    @CheckedTemplate
+    static class Templates {
+        public static native MailTemplate.MailTemplateInstance notification(User user);
+    }
+//
+//    @ResourcePath("EmailNotificationService/notification.html")
+//    MailTemplate notificationTemplate;
+
+    @Override
+    public CompletionStage<Response> sendWithTemplateSimpleNotification() {
+        // prepare user to send notification
+        User user = new User("Barrier", "Barrier Impairment Notification from QuTe template", "hahik2001@outlook.com");
+        /* With @CheckedTemplate mechanism*/
+        return Templates.notification(user)
+                .to(user.getEmail())
+                .subject(user.getSubject())
+                .send()
+                .thenApply(x -> Response.accepted().build());
+
+
+        /* With MailTemplate mechanism
+        return notificationTemplate
+
+                .to(user.getEmail())
+                .from("no-reply@gmail.com")
+                .subject(user.getSubject())
+                .data("User", user)
+                .send()
+                .thenApply(x -> Response.accepted().build());
+        */
+    }
 
     @Override
     public void sendNotification() {

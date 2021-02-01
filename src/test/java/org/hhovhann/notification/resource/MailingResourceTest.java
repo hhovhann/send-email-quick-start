@@ -32,7 +32,7 @@ public class MailingResourceTest {
         // call a REST endpoint that sends email
         given()
                 .when()
-                .get("/send-email")
+                .get("/send-simple-email")
                 .then()
                 .statusCode(202)
                 .body(is("OK"));
@@ -44,15 +44,5 @@ public class MailingResourceTest {
         assertThat(actual.getText(), contains("Wake up!"));
         assertThat(actual.getSubject(), equalTo("Alarm!"));
         assertThat(mailbox.getTotalMessagesSent(), equalTo(6));
-    }
-
-    @Test
-    public void testSendEmailEndpoint() {
-        given()
-                .when()
-                .get("/send-simple-email")
-                .then()
-                .statusCode(202)
-                .body(is("OK"));
     }
 }
