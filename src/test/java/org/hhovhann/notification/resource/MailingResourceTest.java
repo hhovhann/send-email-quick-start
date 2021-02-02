@@ -27,7 +27,7 @@ public class MailingResourceTest {
     @BeforeEach
     void init() { mailbox.clear(); }
 
-    @Test
+//    @Test
     void testTextMail() throws IOException {
         // call a REST endpoint that sends email
         given()

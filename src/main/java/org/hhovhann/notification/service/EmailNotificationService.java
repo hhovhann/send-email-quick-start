@@ -12,6 +12,7 @@ import org.hhovhann.notification.entity.User;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.NotAllowedException;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.concurrent.CompletionStage;
@@ -33,15 +34,43 @@ public class EmailNotificationService implements NotificationService {
     static class Templates {
         public static native MailTemplate.MailTemplateInstance notification(User user);
     }
-//
-//    @ResourcePath("EmailNotificationService/notification.html")
-//    MailTemplate notificationTemplate;
 
+//    @ResourcePath("notificationTemplate.html") not working for some reason when using other path then templates/className
+//    @Inject MailTemplate notification;
+
+    /***
+     * Send Imperative Email Example
+     */
     @Override
-    public CompletionStage<Response> sendWithTemplateSimpleNotification() {
-        // prepare user to send notification
+    public void sendNotification() {
+        mailer.send(Mail.withText(mailReceiver, "A simple email from quarkus", "The Barrier A related to Equipment B has been impaired."));
+    }
+
+    /***
+     * Send Reactive Email Example
+     */
+    @Override
+    public CompletionStage<Response> sendReactiveNotification() {
+        try {
+            return reactiveMailer
+                    .send(Mail.withText(mailReceiver, "A reactive email from quarkus", "The Barrier A related to Equipment B has been impaired."))
+                    .subscribeAsCompletionStage()
+                    .thenApply((x -> Response.accepted().build()));
+        } catch (Exception ex) {
+            System.out.println("{}" + ex.getMessage());
+            throw new NotAllowedException("Not allowed to send message reactively ...");
+        }
+    }
+
+    /***
+     * Send Reactive Email with QuTe template Example
+     * @return
+     */
+    @Override
+    public CompletionStage<Response> sendReactiveNotificationWithQuTeTemplate() {
+        // TODO: Checking that this object we should have as an input
         User user = new User("Barrier", "Barrier Impairment Notification from QuTe template", "hahik2001@outlook.com");
-        /* With @CheckedTemplate mechanism*/
+        /* With @CheckedTemplate mechanism */
         return Templates.notification(user)
                 .to(user.getEmail())
                 .subject(user.getSubject())
@@ -50,8 +79,7 @@ public class EmailNotificationService implements NotificationService {
 
 
         /* With MailTemplate mechanism
-        return notificationTemplate
-
+        return notification
                 .to(user.getEmail())
                 .from("no-reply@gmail.com")
                 .subject(user.getSubject())
@@ -61,35 +89,10 @@ public class EmailNotificationService implements NotificationService {
         */
     }
 
-    @Override
-    public void sendNotification() {
-        // Imperative API:
-        mailer.send(Mail.withText(mailReceiver, "A simple email from quarkus", "The Barrier A related to Equipment B has been impaired."));
-        System.out.println("Imperatively mail was sent");
-        // Reactive API:
-        Uni<Void> stage = reactiveMailer.send(Mail.withText(mailReceiver, "A reactive email from quarkus", "The Barrier A related to Equipment B has been impaired."));
-        try {
-            System.out.println("sendNotification logger: {}" + stage.subscribeAsCompletionStage().get());
-            System.out.println("Reactively mail was sent");
-
-        } catch (Exception ex) {
-            System.out.println("{}" + ex.getMessage());
-        }
-    }
-
-    @Override
-    public void sendSimpleNotification() {
-        mailer.send(Mail.withText(mailReceiver, "A simple email from quarkus", "The Barrier A related to Equipment B has been impaired."));
-    }
-
-    @Override
-    public CompletionStage<Response> sendASimpleEmailAsync() {
-        return reactiveMailer.send(
-                Mail.withText(mailReceiver, "A reactive email from quarkus", "The Barrier A related to Equipment B has been impaired."))
-                .subscribeAsCompletionStage()
-                .thenApply(x -> Response.accepted().build());
-    }
-
+    /***
+     * Send Imperative Email with inline attachment example
+     * @return
+     */
     @Override
     public void sendEmailWithAttachment() {
         mailer.send(Mail.withText(mailReceiver, "An email from quarkus with attachment",
@@ -97,7 +100,10 @@ public class EmailNotificationService implements NotificationService {
                 .addAttachment("my-file.txt",
                         "content of my file".getBytes(), "text/plain"));
     }
-
+    /***
+     * Send Imperative Email with inline html example
+     * @return
+     */
     @Override
     public void sendEmailWithHtml() {
         String body = "<strong>Hello!</strong>" + "\n" +

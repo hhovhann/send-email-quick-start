@@ -6,17 +6,13 @@ import java.util.concurrent.CompletionStage;
 public interface NotificationService {
     void sendNotification();
 
-    default void sendSimpleNotification() {
-        System.out.println("sendSimpleNotification");
+    default CompletionStage<Response> sendReactiveNotification() {
+        System.out.println("sendReactiveNotification");
+        return  null;
     }
 
-    default CompletionStage<Response> sendWithTemplateSimpleNotification() {
+    default CompletionStage<Response> sendReactiveNotificationWithQuTeTemplate() {
         System.out.println("sendWithTemplateSimpleNotification");
-        return null;
-    }
-
-    default CompletionStage<Response> sendASimpleEmailAsync() {
-        System.out.println("sendSimpleNotification");
         return null;
     }
 

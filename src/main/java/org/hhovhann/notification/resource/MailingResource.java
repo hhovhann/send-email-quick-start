@@ -21,20 +21,20 @@ public class MailingResource {
     @GET
     @Path("/send-simple-email-with-qute-template")
     public CompletionStage<Response> send() {
-        return notificationService.sendWithTemplateSimpleNotification();
+        return notificationService.sendReactiveNotificationWithQuTeTemplate();
     }
 
     @GET
-    @Path("/send-simple-email")
-    public Response sendASimpleEmail() {
-        notificationService.sendSimpleNotification();
+    @Path("/send-sync-email")
+    public Response sendImperativeNotification() {
+        notificationService.sendNotification();
         return Response.accepted().build();
     }
 
     @GET
     @Path("/send-async-email")
     public CompletionStage<Response> sendASimpleEmailAsync() {
-        return notificationService.sendASimpleEmailAsync();
+        return notificationService.sendReactiveNotification();
     }
 
     @GET
