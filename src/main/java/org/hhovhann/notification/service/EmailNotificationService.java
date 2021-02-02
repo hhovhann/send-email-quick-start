@@ -4,8 +4,7 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.MailTemplate;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.mailer.reactive.ReactiveMailer;
-import io.quarkus.qute.api.CheckedTemplate;
-import io.smallrye.mutiny.Uni;
+import io.quarkus.qute.api.ResourcePath;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hhovhann.notification.entity.User;
 
@@ -30,13 +29,13 @@ public class EmailNotificationService implements NotificationService {
     @Inject
     ReactiveMailer reactiveMailer;
 
-    @CheckedTemplate
-    static class Templates {
-        public static native MailTemplate.MailTemplateInstance notification(User user);
-    }
+//    @CheckedTemplate
+//    static class Templates {
+//        public static native MailTemplate.MailTemplateInstance notification(User user);
+//    }
 
-//    @ResourcePath("notificationTemplate.html") not working for some reason when using other path then templates/className
-//    @Inject MailTemplate notification;
+    @ResourcePath("notification")
+    @Inject MailTemplate notification;
 
     /***
      * Send Imperative Email Example
@@ -70,15 +69,15 @@ public class EmailNotificationService implements NotificationService {
     public CompletionStage<Response> sendReactiveNotificationWithQuTeTemplate() {
         // TODO: Checking that this object we should have as an input
         User user = new User("Barrier", "Barrier Impairment Notification from QuTe template", "hahik2001@outlook.com");
-        /* With @CheckedTemplate mechanism */
+        /* With @CheckedTemplate mechanism
         return Templates.notification(user)
                 .to(user.getEmail())
                 .subject(user.getSubject())
                 .send()
-                .thenApply(x -> Response.accepted().build());
+                .thenApply(x -> Response.accepted().build());*/
 
 
-        /* With MailTemplate mechanism
+        /* With MailTemplate mechanism */
         return notification
                 .to(user.getEmail())
                 .from("no-reply@gmail.com")
@@ -86,7 +85,7 @@ public class EmailNotificationService implements NotificationService {
                 .data("User", user)
                 .send()
                 .thenApply(x -> Response.accepted().build());
-        */
+
     }
 
     /***
