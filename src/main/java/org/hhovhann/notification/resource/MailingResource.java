@@ -28,7 +28,7 @@ public class MailingResource {
     @Path("/send-sync-email")
     public Response sendImperativeNotification() {
         notificationService.sendNotification();
-        return Response.accepted().build();
+        return Response.accepted("Accepted").build();
     }
 
     @GET

@@ -54,7 +54,7 @@ public class EmailNotificationService implements NotificationService {
             return reactiveMailer
                     .send(Mail.withText(mailReceiver, "A reactive email from quarkus", "The Barrier A related to Equipment B has been impaired."))
                     .subscribeAsCompletionStage()
-                    .thenApply((x -> Response.accepted().build()));
+                    .thenApply((x -> Response.accepted("Accepted").build()));
         } catch (Exception ex) {
             System.out.println("{}" + ex.getMessage());
             throw new NotAllowedException("Not allowed to send message reactively ...");
